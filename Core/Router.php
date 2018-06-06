@@ -52,7 +52,7 @@ class Router {
 	public function match($url) {
 		foreach ($this->routes as $route => $params) {
 			if ($url == $route) {
-				$this->params[$route] = $params;
+				$this->params = $params;
 				return true;
 			}			
 		}
