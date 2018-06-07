@@ -42,13 +42,14 @@ $router->add('posts', ['controller'=>'Posts', 'action'=>'index']);
 $router->add('{controller}/{action}');
 $router->add('{controller}/{id:\d+}/{action}');
 $router->add('admin/{action}/{controller}');
+$router->add('admin/{controller}/{action}', ['namespace' => 'Admin']);
 
 // Displaying the routing table
-/*
+
 echo '<pre>';
 var_dump($router->getRoutes());
 echo '</pre>';
-
+/*
 // Match the requested route
 $url = $_SERVER['QUERY_STRING'];
 

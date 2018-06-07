@@ -156,7 +156,9 @@ class Router {
 			// Naming convention of Controller Classes must follow the PSR-1 standard, 
 			// Uppercase for all first letter of a word, likewise for class method in CamelCase
 			$controller = $this->convertToStudlyCaps($controller);
-			$controller = "App\Controllers\\$controller";
+			// $controller = "App\Controllers\\$controller";
+			// to resolve the subfolder within Controllers issue.
+			$controller = $this->getNamespace() . $controller;
 
 			// check if the controller class exists
 			if (class_exists($controller)) {
@@ -168,10 +170,18 @@ class Router {
 
 				// check if the class contains the action method, and check if its public by using is_callable method. is_callablable takes two input, first the object of the class. Second the method name of the class.
 
-				if (is_callable([$controller_object, $action])) {
+				// if (is_callable([$controller_object, $action])) {
+				// 	$controller_object->$action();
+				// } else {
+				// 	echo "Method $action (in controller $controller) not found";
+				// }
+
+				// To fix the security bleach if the user adds an Action behind the action method to bypass
+				// The before checks
+				if (preg_match('/action$/i', $action) == 0) {
 					$controller_object->$action();
 				} else {
-					echo "Method $action (in controller $controller) not found";
+					throw new \Exception("Method $action in controller $controller cannot be called directly - remove the Action suffix to call this method");
 				}
 			} else {
 				echo "Controller class $controller not found";
@@ -180,6 +190,27 @@ class Router {
 			echo "No route matched.";
 		}
 	}
+
+
+	/**
+	 * Get the namespace for the controller class. the namespace defined in the 
+	 * route parameters is added if present.	 
+	 * 
+	 * @return string The request URL
+	 */
+	protected function getNamespace()
+	{
+		$namespace = 'App\Controllers\\';
+
+		echo 'namespace = ' . var_dump($this->params) . '<BR />';
+
+		if (array_key_exists('namespace', $this->params)) {
+			$namespace .= $this->params['namespace'] . '\\';			
+		}
+
+		return $namespace;
+	}
+
 
 	/**
 	 * Convert the string with hyphens to StudlyCaps
