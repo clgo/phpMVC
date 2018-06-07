@@ -149,6 +149,8 @@ class Router {
 	 */
 	public function dispatch($url) {
 
+		$url = $this->removeQueryStringVariables($url);
+
 		if ($this->match($url)) {
 			$controller = $this->params['controller'];
 			// Naming convention of Controller Classes must follow the PSR-1 standard, 
@@ -159,7 +161,7 @@ class Router {
 			// check if the controller class exists
 			if (class_exists($controller)) {
 				// dynamically creates the controller object
-				$controller_object = new $controller();
+				$controller_object = new $controller($this->params);
 
 				$action = $this->params['action'];
 				$action = $this->convertToCamelCase($action);
